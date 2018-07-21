@@ -1,0 +1,159 @@
+USE sakila;
+
+SELECT first_name, last_name FROM actor;
+
+SELECT CONCAT(first_name, ' ', last_name) 
+AS 'Actor Name' 
+FROM actor;
+
+SELECT actor_id, first_name, last_name
+FROM actor
+WHERE first_name = 'JOE';
+
+SELECT * FROM actor 
+WHERE last_name LIKE '%GEN%';
+
+SELECT last_name, first_name 
+FROM actor 
+WHERE last_name LIKE '%LI%';
+
+SELECT country_id, country 
+FROM country 
+WHERE country IN ('Afghanistan', 'Bangladesh', 'China');
+
+
+ALTER TABLE actor
+	ADD middle_name VARCHAR(25) AFTER first_name;
+    
+ALTER TABLE actor
+	MODIFY COLUMN middle_name BLOB;
+
+ALTER TABLE actor
+	DROP COLUMN middle_name;
+    
+    
+SELECT last_name, COUNT(*) AS 'count' 
+FROM actor 
+GROUP BY last_name;
+
+SELECT last_name, COUNT(*) AS 'count' 
+FROM actor 
+GROUP BY last_name 
+HAVING COUNT(*) > 1;
+
+UPDATE actor
+SET first_name ='HARPO'
+WHERE (first_name ='GROUCHO' AND last_name = 'WILLIAMS');
+
+UPDATE actor
+SET first_name ='GROUCHO'
+WHERE (first_name ='HARPO' AND last_name = 'WILLIAMS');
+
+SET SQL_SAFE_UPDATES = 0;
+
+UPDATE actor
+SET first_name ='MUCHO GROUCHO'
+WHERE first_name ='GROUCHO';
+
+SET SQL_SAFE_UPDATES = 1;
+
+SHOW CREATE TABLE address;
+
+
+SELECT first_name, last_name, address
+FROM staff 
+LEFT JOIN address USING(address_id);
+
+
+SELECT first_name, last_name, SUM(amount) 
+FROM staff
+JOIN payment USING(staff_id)
+WHERE payment_date 
+BETWEEN '2005-08-01' AND '2005-08-31'
+GROUP BY staff_id;
+
+SELECT title, COUNT(*) AS num_actors
+FROM film
+JOIN film_actor USING (film_id)
+GROUP BY film_id;
+
+SELECT COUNT(*)
+FROM inventory
+WHERE film_id IN
+	(
+    SELECT film_id
+    FROM film
+    WHERE title = 'Hunchback Impossible'
+);
+
+SELECT first_name, last_name, SUM(amount) AS 'Total Amount Paid'
+FROM customer
+JOIN payment USING(customer_id)
+GROUP BY customer_id
+ORDER BY last_name, first_name;
+
+
+SELECT title FROM film
+JOIN language USING(language_id)
+WHERE name = 'English'
+AND title IN
+	(SELECT title 
+	FROM film 
+	WHERE title 
+	LIKE 'Q%' OR title LIKE 'K%'
+ );
+ 
+SELECT first_name, last_name
+FROM film_actor
+JOIN film USING(film_id)
+JOIN actor USING(actor_id)
+WHERE title = 'ALONE TRIP';
+ 
+SELECT first_name, last_name, email
+FROM customer
+JOIN address USING(address_id)
+JOIN city USING(city_id)
+JOIN country USING(country_id)
+WHERE country = 'Canada';
+ 
+ 
+SELECT title, category 
+FROM film_list
+WHERE category = 'Family';
+ 
+ 
+SELECT title, COUNT(*) AS frequent_rentals 
+FROM film
+JOIN inventory USING(film_id)
+JOIN rental USING(inventory_id)
+GROUP BY film_id
+ORDER BY frequent_rentals DESC;
+
+
+SELECT * FROM sales_by_store;
+
+
+SELECT store_id, city, country
+FROM store
+JOIN address USING(address_id)
+JOIN city USING(city_id)
+JOIN country USING(country_id);
+
+
+-- 7H NEEDS WORK
+SELECT * FROM sales_by_film_category
+ORDER BY total_sales DESC;
+
+
+
+CREATE VIEW top_five_genres (category, total_sales)
+AS
+SELECT * FROM sales_by_film_category
+ORDER BY total_sales DESC
+LIMIT 5;
+
+
+SELECT * FROM top_five_genres;
+
+ 
+DROP VIEW top_five_genres;
